@@ -21,8 +21,7 @@ rule("slang")
 target("shaders")
   set_kind("object")
 
-    -- make the test target support the construction rules of the markdown file
     add_rules("slang")
 
-    -- adding a markdown file to build
+    -- Build every .slang shader in this directory.
     add_files("*.slang")

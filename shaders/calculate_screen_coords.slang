@@ -4,7 +4,7 @@ struct PushConstants {
     uint32_t positions_index;
 };
 
-// input global positions buffer
+// Input global positions buffers (ping-pong pair).
 [[vk::binding(0, 1)]]
 StructuredBuffer<float3> g_GlobalPositions1;
 [[vk::binding(4, 1)]]
@@ -12,7 +12,7 @@ StructuredBuffer<float3> g_GlobalPositions2;
 [[vk::binding(1, 1)]]
 StructuredBuffer<float3> star_tints;
 
-// output screenpos buffer
+// Output screen position buffer.
 [[vk::binding(3, 1)]]
 RWStructuredBuffer<float2> g_ScreenPositions;
 
@@ -22,9 +22,7 @@ ConstantBuffer<PushConstants> push_constants;
 static const float2 OUT_OF_SCREEN = float2(99999.0, 99999.0);
 
 [numthreads(32, 1, 1)]
-void main(
-    // The unique index of the thread within the entire dispatch grid
-    uint3 ID: SV_DispatchThreadID) {
+void main(uint3 ID: SV_DispatchThreadID) {
     int idx = ID.x;
 
     float3 world_pos = float3(0.0);

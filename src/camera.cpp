@@ -31,7 +31,7 @@ glm::mat4 Camera::rotation_matrix() {
 }
 
 PushConstants Camera::push_constants() {
-    // Use the corrected projection
+    // Combine projection and view into the single matrix the shaders expect.
     return PushConstants{m_projection * view_matrix(),
                          glm::ivec2(640, 480)};
 }

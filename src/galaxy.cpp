@@ -94,10 +94,6 @@ void Galaxy::init_gfx() {
             *m_descriptor_pool, **m_draw_set_layout);
         m_draw_descriptor_sets = std::make_shared<vk::raii::DescriptorSets>(
             *m_gfx_core.device(), draw_set_allocate_info);
-        vk::DescriptorSetAllocateInfo sim_set_allocate_info(*m_descriptor_pool,
-                                                            **m_sim_set_layout);
-        // m_sim_descriptor_sets = std::make_shared<vk::raii::DescriptorSets>(
-        //     *m_gfx_core.device(), sim_set_allocate_info);
 
         vk::DescriptorImageInfo descriptor_image_info;
         descriptor_image_info.setSampler(nullptr)
@@ -306,8 +302,7 @@ void Galaxy::update() {
 
     vk::BufferMemoryBarrier2KHR calc_coords_write_barrier(
         vk::PipelineStageFlagBits2::eComputeShader,
-        vk::AccessFlagBits2::eShaderWrite,  // Since Calc Coords only writes,
-                                            // this is safe to leave as 'Write'
+        vk::AccessFlagBits2::eShaderWrite,  // calc_coords only writes this buffer
         vk::PipelineStageFlagBits2::eComputeShader,
         vk::AccessFlagBits2::eShaderWrite, m_gfx_core.present_family_index(),
         m_gfx_core.present_family_index(), m_gpu_star_data->coords(), 0,
@@ -322,9 +317,8 @@ void Galaxy::update() {
         .front()
         .pipelineBarrier2(sim_calc_coords_dependency);
 
-    push_constants.positions_index =
-        write_buffer_index;  // ***CRITICAL: Must read the recently written
-                             // positions***
+    // Must point at the buffer sim just wrote.
+    push_constants.positions_index = write_buffer_index;
     (*m_gfx_core.command_buffers())
         .front()
         .pushConstants<PushConstants>(*m_calc_coords_pipeline_layout,
@@ -350,8 +344,7 @@ void Galaxy::update() {
         vk::PipelineStageFlagBits2::eComputeShader,
         vk::AccessFlagBits2::eShaderRead, m_gfx_core.present_family_index(),
         m_gfx_core.present_family_index(), m_gpu_star_data->coords(), 0,
-        vk::WholeSize);  // m_gpu_star_data->coords() is the screen position
-                         // buffer
+        vk::WholeSize);  // coords() is the screen position buffer
 
     vk::DependencyInfoKHR calc_draw_dependency({}, {},
                                                calc_to_draw_coords_barrier, {});

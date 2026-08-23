@@ -68,14 +68,12 @@ GPUStarData::GPUStarData(vk::raii::Device& device,
     /* CPU TO BUFFER COPY */
     void* data1 = staging_positions_memory.mapMemory(
         0, sizeof(glm::vec3) * star_data.size());
-    // Assuming star_data.positions is a std::vector<glm::vec3>
     memcpy(data1, star_data.positions().data(),
            (size_t)(sizeof(glm::vec3) * star_data.size()));
     staging_positions_memory.unmapMemory();
     /* CPU TO BUFFER COPY */
     void* data2 = staging_positions_memory2.mapMemory(
         0, sizeof(glm::vec3) * star_data.size());
-    // Assuming star_data.positions is a std::vector<glm::vec3>
     memcpy(data2, star_data.positions().data(),
            (size_t)(sizeof(glm::vec3) * star_data.size()));
     staging_positions_memory2.unmapMemory();
@@ -130,7 +128,6 @@ GPUStarData::GPUStarData(vk::raii::Device& device,
     /* CPU TO BUFFER COPY */
     void* data =
         staging_tints_memory.mapMemory(0, sizeof(glm::vec3) * star_data.size());
-    // Assuming star_data.positions is a std::vector<glm::vec3>
     memcpy(data, star_data.tints().data(),
            (size_t)(sizeof(glm::vec3) * star_data.size()));
     staging_tints_memory.unmapMemory();
@@ -182,7 +179,6 @@ GPUStarData::GPUStarData(vk::raii::Device& device,
     /* CPU TO BUFFER COPY */
     data = staging_weights_memory.mapMemory(
         0, sizeof(glm::float32_t) * star_data.size());
-    // Assuming star_data.positions is a std::vector<glm::vec3>
     memcpy(data, star_data.weights().data(),
            (size_t)(sizeof(glm::float32_t) * star_data.size()));
     staging_weights_memory.unmapMemory();
