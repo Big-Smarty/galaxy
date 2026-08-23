@@ -94,6 +94,8 @@ void Galaxy::init_gfx() {
             *m_descriptor_pool, **m_draw_set_layout);
         m_draw_descriptor_sets = std::make_shared<vk::raii::DescriptorSets>(
             *m_gfx_core.device(), draw_set_allocate_info);
+        vk::DescriptorSetAllocateInfo sim_set_allocate_info(*m_descriptor_pool,
+                                                            **m_sim_set_layout);
 
         vk::DescriptorImageInfo descriptor_image_info;
         descriptor_image_info.setSampler(nullptr)
