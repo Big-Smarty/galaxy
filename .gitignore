@@ -1,0 +1,5 @@
+.xmake/
+build/
+.gdbinit
+compile_commands.json
+shaders/*.spirv
