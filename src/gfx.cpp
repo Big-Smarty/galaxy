@@ -39,7 +39,7 @@ Core::Core()
 
         VkSurfaceKHR _surface;
 
-        glfw::WindowHints{.clientApi = glfw::ClientApi::None}.apply();
+        glfw::WindowHints{.resizable = false, .floating = true, .clientApi = glfw::ClientApi::None}.apply();
         m_window = glfw::Window(640, 480, "Galaxy");
         VkResult result =
             m_window.createSurface(**m_instance.get(), nullptr, &_surface);
@@ -132,6 +132,7 @@ Core::Core()
         m_format = (formats[0].format == vk::Format::eUndefined)
                        ? vk::Format::eB8G8R8A8Unorm
                        : formats[0].format;
+
 
         vk::SurfaceCapabilitiesKHR surface_capabilities =
             m_physical_device->getSurfaceCapabilitiesKHR(*m_surface);
@@ -264,6 +265,7 @@ Core::~Core() {
     if (m_swapchain.use_count() != 0) {
         m_swapchain->clear();
     }
+    m_surface->clear();
 }
 
 void Core::update() { glfw::pollEvents(); }

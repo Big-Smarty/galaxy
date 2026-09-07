@@ -6,6 +6,7 @@
 #include <iostream>
 #include <memory>
 #include <random>
+#include <vulkan/vulkan_core.h>
 #include <vulkan/vulkan_enums.hpp>
 #include <vulkan/vulkan_handles.hpp>
 #include <vulkan/vulkan_raii.hpp>
@@ -248,7 +249,7 @@ void Galaxy::update() {
     vk::Result result;
     std::tie(result, m_image_index) = m_gfx_core.swapchain()->acquireNextImage(
         gfx::util::TIMEOUT, *m_image_acquired_semaphore);
-    if (result != vk::Result::eSuccess) {
+    if (result != vk::Result::eSuccess && result != vk::Result::eSuboptimalKHR) {
         printf("bad result: %i\n", static_cast<uint32_t>(result));
         exit(static_cast<uint32_t>(result));
     }
@@ -374,15 +375,21 @@ void Galaxy::update() {
         m_gfx_core.swapchain_format(), vk::ImageLayout::eUndefined,
         vk::ImageLayout::eTransferSrcOptimal);
 
-    vk::ImageCopy image_copy(image_subresource_layers, vk::Offset3D(),
-                             image_subresource_layers, vk::Offset3D(0, 0, 0),
-                             vk::Extent3D(640, 480, 1));
+    // vk::ImageCopy image_copy(image_subresource_layers, vk::Offset3D(),
+    //                          image_subresource_layers, vk::Offset3D(0, 0, 0),
+    //                          vk::Extent3D(640, 480, 1));
 
-    (*m_gfx_core.command_buffers())
-        .front()
-        .copyImage(*m_intermediate_image, vk::ImageLayout::eTransferSrcOptimal,
-                   m_gfx_core.swapchain_images()[m_image_index],
-                   vk::ImageLayout::eTransferDstOptimal, image_copy);
+    // (*m_gfx_core.command_buffers())
+    //     .front()
+    //     .copyImage(*m_intermediate_image, vk::ImageLayout::eTransferSrcOptimal,
+    //                m_gfx_core.swapchain_images()[m_image_index],
+    //                vk::ImageLayout::eTransferDstOptimal, image_copy);
+
+    vk::ImageBlit2 image_blit = vk::ImageBlit2(image_subresource_layers, {vk::Offset3D(), vk::Offset3D(640, 480, 1)}, image_subresource_layers, {vk::Offset3D(), vk::Offset3D(640, 480, 1)});
+
+    vk::BlitImageInfo2 image_blit_info = vk::BlitImageInfo2(*m_intermediate_image, vk::ImageLayout::eTransferSrcOptimal, m_gfx_core.swapchain_images()[m_image_index], vk::ImageLayout::eTransferDstOptimal, image_blit);
+
+    (*m_gfx_core.command_buffers()).front().blitImage2(image_blit_info);
 
     vk::ImageMemoryBarrier pre_present_barrier(
         vk::AccessFlagBits::eTransferWrite, {},
